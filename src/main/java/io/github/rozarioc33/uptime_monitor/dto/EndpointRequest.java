@@ -14,8 +14,8 @@ public class EndpointRequest {
     private String url;
 
     @Positive
-    private Integer intervalSeconds;
+    private Integer intervalSeconds = 30;
 
     @Positive
-    private Integer timeoutSeconds;
+    private Integer timeoutSeconds = 5;
 }
