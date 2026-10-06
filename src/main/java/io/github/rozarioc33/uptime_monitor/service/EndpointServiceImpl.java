@@ -59,4 +59,21 @@ public class EndpointServiceImpl implements EndpointService{
 
         return responses;
     }
+
+    @Override
+    public EndpointResponse updateEndpoint(Long id, EndpointRequest request) {
+
+        Endpoint endpoint = endpointRepository.findById(id)
+                .orElseThrow(() -> new EndpointNotFoundException(id));
+
+        endpoint.setName(request.getName());
+        endpoint.setUrl(request.getUrl());
+        endpoint.setIntervalSeconds(request.getIntervalSeconds());
+        endpoint.setTimeoutSeconds(request.getTimeoutSeconds());
+
+        Endpoint savedEndpoint = endpointRepository.save(endpoint);
+
+        return endpointMapper.toResponse(savedEndpoint);
+
+    }
 }

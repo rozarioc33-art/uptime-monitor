@@ -36,4 +36,14 @@ public class EndpointController {
 
         return endpointServiceImpl.getAllEndpoints();
     }
+
+    @PutMapping("/{id}")
+    public EndpointResponse updateEndpoint(
+            @PathVariable Long id,
+            @Valid @RequestBody EndpointRequest request
+    ) {
+
+        return endpointServiceImpl.updateEndpoint(id, request);
+    }
+
 }

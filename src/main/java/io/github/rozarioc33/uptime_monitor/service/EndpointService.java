@@ -12,4 +12,6 @@ public interface EndpointService {
     public EndpointResponse getEndpointById(Long id);
 
     public List<EndpointResponse> getAllEndpoints();
+
+    public EndpointResponse updateEndpoint(Long id, EndpointRequest request);
 }
