@@ -76,4 +76,13 @@ public class EndpointServiceImpl implements EndpointService{
         return endpointMapper.toResponse(savedEndpoint);
 
     }
+
+    @Override
+    public void deleteEndpoint(Long id) {
+
+        Endpoint endpoint = endpointRepository.findById(id)
+                .orElseThrow(() -> new EndpointNotFoundException(id));
+
+        endpointRepository.delete(endpoint);
+    }
 }

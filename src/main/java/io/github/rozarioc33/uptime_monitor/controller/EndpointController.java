@@ -4,7 +4,6 @@ import io.github.rozarioc33.uptime_monitor.dto.EndpointRequest;
 import io.github.rozarioc33.uptime_monitor.dto.EndpointResponse;
 import io.github.rozarioc33.uptime_monitor.service.EndpointServiceImpl;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,6 +43,12 @@ public class EndpointController {
     ) {
 
         return endpointServiceImpl.updateEndpoint(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteEndpoint(@PathVariable Long id) {
+
+        endpointServiceImpl.deleteEndpoint(id);
     }
 
 }

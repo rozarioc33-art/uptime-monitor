@@ -14,4 +14,6 @@ public interface EndpointService {
     public List<EndpointResponse> getAllEndpoints();
 
     public EndpointResponse updateEndpoint(Long id, EndpointRequest request);
+
+    public void deleteEndpoint(Long id);
 }
