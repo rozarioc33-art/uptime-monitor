@@ -3,9 +3,12 @@ package io.github.rozarioc33.uptime_monitor.service;
 import io.github.rozarioc33.uptime_monitor.dto.EndpointRequest;
 import io.github.rozarioc33.uptime_monitor.dto.EndpointResponse;
 import io.github.rozarioc33.uptime_monitor.entity.Endpoint;
+import io.github.rozarioc33.uptime_monitor.exception.EndpointNotFoundException;
 import io.github.rozarioc33.uptime_monitor.mapper.EndpointMapper;
 import io.github.rozarioc33.uptime_monitor.repository.EndpointRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class EndpointServiceImpl implements EndpointService{
@@ -31,5 +34,14 @@ public class EndpointServiceImpl implements EndpointService{
         Endpoint savedEndpoint = endpointRepository.save(endpoint);
 
         return endpointMapper.toResponse(savedEndpoint);
+    }
+
+    @Override
+    public EndpointResponse getEndpointById(Long id) {
+
+        Endpoint endpoint = endpointRepository.findById(id)
+                .orElseThrow(() -> new EndpointNotFoundException(id));
+
+        return endpointMapper.toResponse(endpoint);
     }
 }

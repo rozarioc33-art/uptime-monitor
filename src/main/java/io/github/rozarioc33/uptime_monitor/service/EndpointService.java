@@ -6,4 +6,6 @@ import io.github.rozarioc33.uptime_monitor.dto.EndpointResponse;
 public interface EndpointService {
 
     public EndpointResponse createEndpoint(EndpointRequest request);
+
+    public EndpointResponse getEndpointById(Long id);
 }

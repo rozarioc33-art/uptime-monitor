@@ -5,10 +5,7 @@ import io.github.rozarioc33.uptime_monitor.dto.EndpointResponse;
 import io.github.rozarioc33.uptime_monitor.service.EndpointServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/endpoints")
@@ -24,5 +21,11 @@ public class EndpointController {
     public EndpointResponse createEndpoint(@Valid @RequestBody EndpointRequest request) {
 
         return endpointServiceImpl.createEndpoint(request);
+    }
+
+    @GetMapping("/{id}")
+    public EndpointResponse getEndpointById(@PathVariable Long id) {
+
+        return endpointServiceImpl.getEndpointById(id);
     }
 }
