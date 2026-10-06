@@ -8,6 +8,8 @@ import io.github.rozarioc33.uptime_monitor.mapper.EndpointMapper;
 import io.github.rozarioc33.uptime_monitor.repository.EndpointRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -43,5 +45,18 @@ public class EndpointServiceImpl implements EndpointService{
                 .orElseThrow(() -> new EndpointNotFoundException(id));
 
         return endpointMapper.toResponse(endpoint);
+    }
+
+    @Override
+    public List<EndpointResponse> getAllEndpoints() {
+
+        List<Endpoint> endpoints = endpointRepository.findAll();
+        List<EndpointResponse> responses = new ArrayList<>();
+
+        for (Endpoint endpoint : endpoints) {
+            responses.add(endpointMapper.toResponse(endpoint));
+        }
+
+        return responses;
     }
 }

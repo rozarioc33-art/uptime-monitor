@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/endpoints")
 public class EndpointController {
@@ -27,5 +29,11 @@ public class EndpointController {
     public EndpointResponse getEndpointById(@PathVariable Long id) {
 
         return endpointServiceImpl.getEndpointById(id);
+    }
+
+    @GetMapping
+    public List<EndpointResponse> getAllEndpoints() {
+
+        return endpointServiceImpl.getAllEndpoints();
     }
 }
