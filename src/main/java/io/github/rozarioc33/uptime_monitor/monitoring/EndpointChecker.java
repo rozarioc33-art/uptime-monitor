@@ -25,10 +25,9 @@ public class EndpointChecker {
                 .GET()
                 .build();
 
+        long startTime = System.nanoTime();
+
         try {
-
-            long startTime = System.nanoTime();
-
             HttpResponse<String> response = httpClient.send(
                     request,
                     HttpResponse.BodyHandlers.ofString()
@@ -46,15 +45,25 @@ public class EndpointChecker {
             checkResult.setEndpoint(endpoint);
             checkResult.setStatusCode(statusCode);
             checkResult.setResponseTimeMs(responseTimeMs);
+            checkResult.setSuccess(success);
             checkResult.setCheckedAt(LocalDateTime.now());
 
             return checkResult;
 
         } catch (IOException | InterruptedException e) {
 
+            long responseTimeMs =
+                    (System.nanoTime() - startTime) / 1_000_000;
 
+            CheckResult checkResult = new CheckResult();
+
+            checkResult.setEndpoint(endpoint);
+            checkResult.setStatusCode(null);
+            checkResult.setResponseTimeMs(responseTimeMs);
+            checkResult.setSuccess(false);
+            checkResult.setCheckedAt(LocalDateTime.now());
+
+            return checkResult;
         }
-
-        return null;
     }
 }
