@@ -8,6 +8,8 @@ import io.github.rozarioc33.uptime_monitor.repository.CheckResultRepository;
 import io.github.rozarioc33.uptime_monitor.repository.EndpointRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class MonitoringServiceImpl implements MonitoringService{
 
@@ -33,6 +35,19 @@ public class MonitoringServiceImpl implements MonitoringService{
         CheckResult checkResult = endpointChecker.check(endpoint);
 
         checkResultRepository.save(checkResult);
+    }
+
+    @Override
+    public void checkEnabledEndpoints() {
+
+        List<Endpoint> endpoints = endpointRepository.findByEnabledTrue();
+
+        for (Endpoint endpoint: endpoints) {
+
+            CheckResult checkResult = endpointChecker.check(endpoint);
+
+            checkResultRepository.save(checkResult);
+        }
     }
 
 }
