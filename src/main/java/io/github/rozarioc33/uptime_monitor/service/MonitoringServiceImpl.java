@@ -8,7 +8,10 @@ import io.github.rozarioc33.uptime_monitor.repository.CheckResultRepository;
 import io.github.rozarioc33.uptime_monitor.repository.EndpointRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MonitoringServiceImpl implements MonitoringService{
@@ -44,8 +47,28 @@ public class MonitoringServiceImpl implements MonitoringService{
 
         for (Endpoint endpoint: endpoints) {
 
-            CheckResult checkResult = endpointChecker.check(endpoint);
+            Optional<CheckResult> latestResult = checkResultRepository
+                    .findFirstByEndpointIdOrderByCheckedAtDesc(endpoint.getId());
 
+            if (latestResult.isEmpty()) {
+
+                CheckResult checkResult = endpointChecker.check(endpoint);
+                checkResultRepository.save(checkResult);
+                continue;
+            }
+
+            CheckResult previousResult = latestResult.get();
+
+            long elapsedTime = Duration.between(
+                    previousResult.getCheckedAt(),
+                    LocalDateTime.now()
+            ).getSeconds();
+
+            if (elapsedTime < endpoint.getIntervalSeconds()) {
+                continue;
+            }
+
+            CheckResult checkResult = endpointChecker.check(endpoint);
             checkResultRepository.save(checkResult);
         }
     }
