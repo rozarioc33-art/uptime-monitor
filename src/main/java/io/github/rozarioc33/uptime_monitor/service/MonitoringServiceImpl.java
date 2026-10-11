@@ -2,10 +2,12 @@ package io.github.rozarioc33.uptime_monitor.service;
 
 import io.github.rozarioc33.uptime_monitor.entity.CheckResult;
 import io.github.rozarioc33.uptime_monitor.entity.Endpoint;
+import io.github.rozarioc33.uptime_monitor.entity.EndpointState;
 import io.github.rozarioc33.uptime_monitor.exception.EndpointNotFoundException;
 import io.github.rozarioc33.uptime_monitor.monitoring.EndpointChecker;
 import io.github.rozarioc33.uptime_monitor.repository.CheckResultRepository;
 import io.github.rozarioc33.uptime_monitor.repository.EndpointRepository;
+import io.github.rozarioc33.uptime_monitor.repository.EndpointStateRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -19,14 +21,51 @@ public class MonitoringServiceImpl implements MonitoringService{
     private final EndpointRepository endpointRepository;
     private final EndpointChecker endpointChecker;
     private final CheckResultRepository checkResultRepository;
+    private final EndpointStateRepository endpointStateRepository;
 
     public MonitoringServiceImpl(EndpointRepository endpointRepository,
                                 EndpointChecker endpointChecker,
-                                 CheckResultRepository checkResultRepository) {
+                                 CheckResultRepository checkResultRepository,
+                                 EndpointStateRepository endpointStateRepository) {
 
         this.endpointRepository = endpointRepository;
         this.endpointChecker = endpointChecker;
         this.checkResultRepository = checkResultRepository;
+        this.endpointStateRepository = endpointStateRepository;
+    }
+
+    private EndpointState getOrCreateState(Endpoint endpoint) {
+
+        Optional<EndpointState> existingState  = endpointStateRepository
+                .findByEndpointId(endpoint.getId());
+
+        return existingState.orElseGet(() -> {
+            EndpointState state = new EndpointState();
+            state.setEndpoint(endpoint);
+
+            return endpointStateRepository.save(state);
+        });
+
+    }
+
+    private void processCheckResult(Endpoint endpoint, CheckResult checkResult) {
+
+        checkResultRepository.save(checkResult);
+
+        EndpointState state = getOrCreateState(endpoint);
+
+        if (checkResult.getSuccess()) {
+            state.setConsecutiveFailures(0);
+        } else {
+            state.setConsecutiveFailures(
+                    state.getConsecutiveFailures() + 1
+            );
+        }
+
+        state.setHealthy(state.getConsecutiveFailures() < 3);
+        state.setLastCheckedAt(checkResult.getCheckedAt());
+
+        endpointStateRepository.save(state);
     }
 
     @Override
@@ -36,8 +75,7 @@ public class MonitoringServiceImpl implements MonitoringService{
                 .orElseThrow(() -> new EndpointNotFoundException(endpointId));
 
         CheckResult checkResult = endpointChecker.check(endpoint);
-
-        checkResultRepository.save(checkResult);
+        processCheckResult(endpoint, checkResult);
     }
 
     @Override
@@ -69,7 +107,7 @@ public class MonitoringServiceImpl implements MonitoringService{
             }
 
             CheckResult checkResult = endpointChecker.check(endpoint);
-            checkResultRepository.save(checkResult);
+            processCheckResult(endpoint, checkResult);
         }
     }
 
