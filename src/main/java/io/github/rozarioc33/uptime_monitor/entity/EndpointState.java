@@ -1,7 +1,9 @@
 package io.github.rozarioc33.uptime_monitor.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -9,6 +11,8 @@ import java.time.LocalDateTime;
 @Table(name = "endpoint_states")
 
 @Data
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class EndpointState {
 
     @Id
