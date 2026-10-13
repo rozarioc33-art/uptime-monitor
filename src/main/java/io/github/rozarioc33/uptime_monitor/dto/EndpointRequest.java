@@ -18,4 +18,6 @@ public class EndpointRequest {
 
     @Positive
     private Integer timeoutSeconds = 5;
+
+    private Boolean enabled;
 }

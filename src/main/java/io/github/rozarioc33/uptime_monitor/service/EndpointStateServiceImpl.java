@@ -2,7 +2,9 @@ package io.github.rozarioc33.uptime_monitor.service;
 
 import io.github.rozarioc33.uptime_monitor.dto.EndpointHealthResponse;
 import io.github.rozarioc33.uptime_monitor.entity.EndpointState;
+import io.github.rozarioc33.uptime_monitor.exception.CheckResultNotFoundException;
 import io.github.rozarioc33.uptime_monitor.exception.EndpointNotFoundException;
+import io.github.rozarioc33.uptime_monitor.mapper.EndpointStateMapper;
 import io.github.rozarioc33.uptime_monitor.repository.EndpointRepository;
 import io.github.rozarioc33.uptime_monitor.repository.EndpointStateRepository;
 import org.springframework.http.HttpStatus;
@@ -15,14 +17,17 @@ public class EndpointStateServiceImpl implements EndpointStateService{
 
     private final EndpointStateRepository endpointStateRepository;
     private final EndpointRepository endpointRepository;
+    private final EndpointStateMapper endpointStateMapper;
 
     public EndpointStateServiceImpl(
             EndpointStateRepository endpointStateRepository,
-            EndpointRepository endpointRepository
+            EndpointRepository endpointRepository,
+            EndpointStateMapper endpointStateMapper
     ) {
 
         this.endpointStateRepository = endpointStateRepository;
         this.endpointRepository = endpointRepository;
+        this.endpointStateMapper = endpointStateMapper;
     }
 
     @Override
@@ -33,17 +38,9 @@ public class EndpointStateServiceImpl implements EndpointStateService{
 
         EndpointState endpointState = endpointStateRepository.findByEndpointId(endpointId)
                 .orElseThrow(() ->
-                    new ResponseStatusException(
-                        HttpStatus.SERVICE_UNAVAILABLE,
-                        "Endpoint health state not found"
-                )
+                    new CheckResultNotFoundException(endpointId)
             );
 
-        return new EndpointHealthResponse(
-                endpointState.getEndpoint().getId(),
-                endpointState.isHealthy(),
-                endpointState.getConsecutiveFailures(),
-                endpointState.getLastCheckedAt()
-        );
+            return endpointStateMapper.toEndpointHealthResponse(endpointState);
     }
 }

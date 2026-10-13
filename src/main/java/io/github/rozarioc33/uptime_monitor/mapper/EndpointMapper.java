@@ -31,6 +31,11 @@ public class EndpointMapper {
         endpoint.setUrl(request.getUrl());
         endpoint.setIntervalSeconds(request.getIntervalSeconds());
         endpoint.setTimeoutSeconds(request.getTimeoutSeconds());
+        endpoint.setEnabled(
+                request.getIntervalSeconds() != null
+                        ? request.getEnabled()
+                        : true
+        );
 
         return endpoint;
     }
