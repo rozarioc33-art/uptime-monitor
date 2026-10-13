@@ -9,6 +9,9 @@ import io.github.rozarioc33.uptime_monitor.repository.CheckResultRepository;
 import io.github.rozarioc33.uptime_monitor.repository.EndpointRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class LatestCheckServiceImpl implements LatestCheckService {
 
@@ -39,5 +42,28 @@ public class LatestCheckServiceImpl implements LatestCheckService {
                         );
 
         return checkResultMapper.toLatestCheckResponse(checkResult);
+    }
+
+    @Override
+    public List<LatestCheckResponse> getCheckHistory(Long endpointId) {
+
+        List<LatestCheckResponse> responses = new ArrayList<>();
+
+        endpointRepository.findById(endpointId)
+                .orElseThrow(() ->
+                        new EndpointNotFoundException(endpointId)
+                        );
+
+        List<CheckResult> checkResults = checkResultRepository
+                .findByEndpointIdOrderByCheckedAtDesc(endpointId);
+
+        for (CheckResult checkResult : checkResults) {
+
+            LatestCheckResponse response =
+                    checkResultMapper.toLatestCheckResponse(checkResult);
+            responses.add(response);
+        }
+
+        return responses;
     }
 }
