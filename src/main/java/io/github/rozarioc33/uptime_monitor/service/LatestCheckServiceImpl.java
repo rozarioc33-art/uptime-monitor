@@ -7,6 +7,9 @@ import io.github.rozarioc33.uptime_monitor.exception.EndpointNotFoundException;
 import io.github.rozarioc33.uptime_monitor.mapper.CheckResultMapper;
 import io.github.rozarioc33.uptime_monitor.repository.CheckResultRepository;
 import io.github.rozarioc33.uptime_monitor.repository.EndpointRepository;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -45,7 +48,9 @@ public class LatestCheckServiceImpl implements LatestCheckService {
     }
 
     @Override
-    public List<LatestCheckResponse> getCheckHistory(Long endpointId) {
+    public Page<LatestCheckResponse> getCheckHistory(
+            Long endpointId,
+            Pageable pageable) {
 
         List<LatestCheckResponse> responses = new ArrayList<>();
 
@@ -54,16 +59,15 @@ public class LatestCheckServiceImpl implements LatestCheckService {
                         new EndpointNotFoundException(endpointId)
                         );
 
-        List<CheckResult> checkResults = checkResultRepository
-                .findByEndpointIdOrderByCheckedAtDesc(endpointId);
+        Page<CheckResult> checkResults =
+                checkResultRepository
+                    .findByEndpointIdOrderByCheckedAtDesc(
+                        endpointId, pageable
+                    );
 
-        for (CheckResult checkResult : checkResults) {
-
-            LatestCheckResponse response =
-                    checkResultMapper.toLatestCheckResponse(checkResult);
-            responses.add(response);
-        }
-
-        return responses;
+        return checkResults.map(
+                checkResult ->
+                        checkResultMapper.toLatestCheckResponse(checkResult)
+        );
     }
 }
